@@ -36,8 +36,21 @@ router.post("/",
 
  await newReview.save();
  await listing.save();
+ req.flash("success","New Review Added!")
 
 res.redirect(`/listings/${listing._id}`);
+////
+
+// const { id } = req.params;
+//   const listing = await Listing.findById(id);
+//   const review = new Review(req.body.review);
+//   listing.reviews.push(review);
+
+//   await review.save();
+//   await listing.save();
+
+//   req.flash("success", "New Review Added!");
+//   res.redirect(`/listings/${id}`);
   
 // console.log("new Review saved");
 // res.send("new review saved");
@@ -49,7 +62,8 @@ router.delete("/:reviewId",
   wrapAsync(async (req, res)=>{
   let {id,reviewId}=req.params;
   await Listing.findByIdAndUpdate(id,{$pull:{reviews:reviewId}})
-  await Review.findById(reviewId);
+  await Review.findByIdAndDelete(reviewId);
+   req.flash("success"," Review Delete! ")
   res.redirect(`/listings/${id}`);
 }));
 

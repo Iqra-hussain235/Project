@@ -13,8 +13,9 @@ const User = require("./models/user.js");
 
 
 
-const listings=require("./routes/listing.js");
-const reviews=require("./routes/review.js");
+const listingRouter= require("./routes/listing.js");
+const reviewRouter= require("./routes/review.js");
+const userRouter = require("./routes/user.js");
 
 
 
@@ -43,6 +44,8 @@ app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate);
 app.use(express.static('public'));
 
+console.log("View path:", path.join(__dirname, "views"));
+console.log(mongoose.modelNames());
 const sessionOptions={
   secret:"mysupersecretcode",
   resave:false,
@@ -57,6 +60,8 @@ const sessionOptions={
 app.get("/",(req,res)=>{
    res.send("succesfullt");
 });
+
+
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -74,6 +79,7 @@ app.use((req,res,next)=>{
   res.locals.error =req.flash("error");
   console.log( res.locals.success);
   console.log( res.locals.error);
+  res.locals.currUser = req.user;
     next();
 });
 
@@ -91,8 +97,9 @@ app.get("/demouser",async (req,res)=>{
 
 // });
 
-app.use("/listings",listings);
-app.use("/listings/:id/review",reviews);
+app.use("/listings",listingRouter);
+app.use("/listings/:id/review", reviewRouter);
+app.use("/",userRouter);
 
 
 // /:id/reviews/:reviewId

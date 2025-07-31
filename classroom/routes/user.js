@@ -3,11 +3,9 @@ const router = express.Router();
 
 
 
-router.get("/",(req,res)=>{
-    res.send("hi i am root");
-})
+
 //index user
-router.get("/user",(req,res)=>{
+router.get("/",(req,res)=>{
     res.send("get for user")
 });
 //show user

@@ -12,6 +12,7 @@ module.exports.renderNewForm = (req, res)=>{
 module.exports.showListing=async (req, res) => {
   let { id } = req.params;
   const listing = await Listing.findById(id)
+ 
   .populate({path:"reviews",
     populate:{
     path:"author",
@@ -24,11 +25,15 @@ module.exports.showListing=async (req, res) => {
   }
   console.log(listing);
   res.render("listings/show.ejs", { listing });
-}
+} 
 
 module.exports.createListing=async(req, res,next)=>{
+  let url =req.file.path;
+  let filename =req.file.filename;
+  
   const newListing =new Listing(req.body.listing);
   newListing.owner = req.user._id;
+  newListing.image ={url,filename};
     await newListing.save();
     req.flash("success","New listing Created!");
     res.redirect("/listings");
@@ -42,9 +47,11 @@ module.exports.renderEditForm =async(req,res)=>{
     req.flash("error","Listing you  requested for edit  does not exist!");
      return res.redirect("/listings");
   }
+  let originalImageUrl = listing.image.url;
+  originalImageUrl=originalImageUrl.replace("/upload","/upload/h_300,w_250");
    req.flash("success","Edit listing!")
-  res.render("listings/edit.ejs",{listing});
-}
+  res.render("listings/edit.ejs",{listing,originalImageUrl});
+};
 
 module.exports.Delete=async(req,res)=>{
 let  {id} =req.params;
@@ -59,7 +66,14 @@ module.exports.renderUpdate=async(req,res)=>{
     throw new  ExpressError(400,"send valid data for listing");
   }
   let  {id} =req.params;
-  await Listing.findByIdAndUpdate(id, {...req.body.listing});
-   req.flash("success","Updated Listing!")
-   res.redirect(`/listings/${id}`);
+  let listing = await listing.findByIdAndUpdate(id, {...req.body.listing});
+
+  if(typeof req.file !== "undefined"){
+  let url =req.file.path;
+  let filename =req.file.filename; 
+  listing.image ={url,filename};
+  await listing.save()
+}
+req.flash("success","Updated Listing!")
+res.redirect(`/listings/${id}`);
 }

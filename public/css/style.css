@@ -117,3 +117,16 @@ body{
     padding-left: 0;
     padding-right: 0;
 }
+
+
+/* Map */
+/* body { margin: 0; padding: 0; } */
+#map {
+    width: 80vh;
+    height: 300px;
+/* position: absolute;
+top: 0;
+bottom: 0; 
+width: 100%; */
+
+}

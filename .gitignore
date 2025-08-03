@@ -3,3 +3,5 @@ node_modules/
 modified:.env
 .env
 .env
+node_modules/
+.env

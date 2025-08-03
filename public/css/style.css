@@ -3,11 +3,12 @@ body{
      /* display: flex; */
      /* background-color: #fe424d; */
 }
-/* 
-.container {
-    flex: 1;
 
-} */
+ .container {
+    /* flex: 1; */
+    max-width: 125px;
+
+} 
 
 .navbar{
     height: 5rem;
@@ -57,6 +58,8 @@ body{
     flex-wrap: wrap;
     justify-content: center;
     align-items: space-evenly;
+        position: static;
+    margin-top: 410px;
 }
 
 

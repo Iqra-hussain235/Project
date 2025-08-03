@@ -32,6 +32,36 @@ app.use(express.urlencoded({ extended: true }));
 
 // const MONGO_URL ="mongodb://127.0.0.1:27017/wanderlust";
 const dburl= process.env.ATLASDB_URL;
+if (!dburl) {
+  console.error('❌ ATLASDB_URL environment variable is missing.');
+  process.exit(1);
+}
+
+mongoose.set('debug', true); // optional: shows queries and internals
+
+async function main() {
+  try {
+    await mongoose.connect(dburl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000, // fail faster if can't reach server
+    });
+    console.log('✅ Connected to MongoDB');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err);
+    // depending on your app: retry logic could go here
+    process.exit(1); // exit so you don’t run with no DB
+  }
+}
+
+// attach listeners for extra visibility
+mongoose.connection.on('disconnected', () => {
+  console.warn('⚠️ MongoDB disconnected.');
+});
+mongoose.connection.on('reconnected', () => {
+  console.log('🔁 MongoDB reconnected.');
+});
+
 
 main()
     .then(()=>{
@@ -133,9 +163,9 @@ app.use((err, req, res, next) => {
 });
 //wraperror handle
 
+const port = process.env.PORT || 8080;
 
-
-app.listen(8080,()=>{
+app.listen(port,()=>{
   console.log("server is listening to port 8080");
 });
 

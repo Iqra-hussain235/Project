@@ -162,6 +162,10 @@ app.use((err, req, res, next) => {
 });
 //wraperror handle
 
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 const port = process.env.PORT || 8080;
 
 app.listen(port,()=>{

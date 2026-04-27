@@ -32,7 +32,7 @@
 <br/>
 
    <!--yaha prr error hai   -->
-<% if(currUser && listing.owner._id.equals(currUser._id)) {%>
+<% if(locals.currUser && listing.owner._id.equals(locals.currUser._id)) {%>
    <div class="btns">
     <a href="/listings/<%=listing._id%>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
     <form method="post" action="/listings/<%=listing._id%>?_method=DELETE">
@@ -42,7 +42,7 @@
     <% }%>
     
     <div class="col-8 offset-3 mb-3">
-      <% if(currUser) {%>
+      <% if(locals.currUser) {%>
         <hr />
   <h4>Leave a Review</h4>
   <form action="/listings/<%= listing.id %>/review" 

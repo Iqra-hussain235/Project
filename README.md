@@ -35,5 +35,7 @@ Wanderlust is a **Node.js + Express** web application that allows users to manag
 1. **Clone the repo**
 
 ```bash
-git clone https://github.com/iqrahussain/wanderlust.git
-cd wanderlust
+git clone https://github.com/Iqra-hussain235/Project.git
+cd Project
+npm install
+npm start

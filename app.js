@@ -146,6 +146,10 @@ app.get("/demouser",async (req,res)=>{
 
 // });
 
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
+
 app.use("/listings",listingRouter);
 app.use("/listings/:id/review", reviewRouter);
 app.use("/",userRouter);
@@ -158,12 +162,6 @@ app.use("/",userRouter);
 app.use((err, req, res, next) => {
   const { statusCode = 500, message = "Something went wrong!" } = err;
   res.status(statusCode).render("error.ejs",{message});
-  // res.status(statusCode).send(message);
-});
-//wraperror handle
-
-app.get('*', function(req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 const port = process.env.PORT || 8080;

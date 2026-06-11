@@ -1,18 +1,103 @@
 <footer>
-    <div class="f-info">
-
-    
+  <div class="f-info">
     <div class="f-info-socials">
-    <i class="fa-brands fa-square-facebook"></i>
-    <i class="fa-brands fa-square-instagram"></i>
-    <i class="fa-brands fa-linkedin"></i>
+      <i class="fa-brands fa-square-facebook"></i>
+      <i class="fa-brands fa-square-instagram"></i>
+      <i class="fa-brands fa-linkedin"></i>
     </div>
     <div class="f-info-brand">&copy; WanderLust private Limited</div>
     <div class="f-info-links">
-        <a href="/privacy">Privacy</a>
-        <a href="/term">Tremss</a>
-
+      <a href="/privacy">Privacy</a>
+      <a href="/term">Terms</a>
+      <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#feedbackModal" style="text-decoration: none; color: #222222; padding: 0;">Feedback</button>
     </div>
-    </div>
-
+  </div>
 </footer>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-bottom" style="background: linear-gradient(135deg, #fe6a6b 0%, #fcae6b 100%);">
+        <h1 class="modal-title fs-5" id="feedbackModalLabel" style="color: #ffffff; font-weight: 700;">Share Your Feedback</h1>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="feedbackForm">
+          <div class="mb-3">
+            <label for="feedbackName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="feedbackName" placeholder="Your name" required>
+          </div>
+          <div class="mb-3">
+            <label for="feedbackEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="feedbackEmail" placeholder="your@email.com" required>
+          </div>
+          <div class="mb-3">
+            <label for="feedbackMessage" class="form-label">Your Feedback</label>
+            <textarea class="form-control" id="feedbackMessage" rows="5" placeholder="Tell us what you think..." required></textarea>
+          </div>
+          <div id="feedbackStatus" style="display: none;" class="alert" role="alert"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn" id="submitFeedback" style="background-color: #fe424d; color: #ffffff; border: none;">Send Feedback</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const feedbackForm = document.getElementById('feedbackForm');
+  const submitBtn = document.getElementById('submitFeedback');
+  const feedbackStatus = document.getElementById('feedbackStatus');
+
+  submitBtn.addEventListener('click', async () => {
+    const name = document.getElementById('feedbackName').value.trim();
+    const email = document.getElementById('feedbackEmail').value.trim();
+    const message = document.getElementById('feedbackMessage').value.trim();
+
+    if (!name || !email || !message) {
+      feedbackStatus.style.display = 'block';
+      feedbackStatus.className = 'alert alert-warning';
+      feedbackStatus.textContent = 'Please fill in all fields.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+
+    try {
+      const response = await fetch('/send-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        feedbackStatus.style.display = 'block';
+        feedbackStatus.className = 'alert alert-success';
+        feedbackStatus.textContent = 'Thank you! Your feedback has been sent successfully.';
+        feedbackForm.reset();
+        setTimeout(() => {
+          const modal = bootstrap.Modal.getInstance(document.getElementById('feedbackModal'));
+          modal.hide();
+          feedbackStatus.style.display = 'none';
+        }, 2000);
+      } else {
+        feedbackStatus.style.display = 'block';
+        feedbackStatus.className = 'alert alert-danger';
+        feedbackStatus.textContent = data.message || 'Failed to send feedback. Please try again.';
+      }
+    } catch (error) {
+      feedbackStatus.style.display = 'block';
+      feedbackStatus.className = 'alert alert-danger';
+      feedbackStatus.textContent = 'Error sending feedback. Please try again later.';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Feedback';
+    }
+  });
+</script>

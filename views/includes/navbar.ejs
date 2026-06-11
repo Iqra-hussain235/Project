@@ -1,29 +1,47 @@
 
 <style>
-  .search-btn{
-     background-color: #fe424d;
-     color: #ffff;
-     border-radius: 25px;
-     padding: 0 1rem 0 1rem;
-     
+  .search-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex: 1;
+    max-width: 400px;
   }
-  .search-btn:hover{
-     background-color: #f02633;
-     /* color: #ffff; */
-    
+  .search-input {
+    border-radius: 25px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+    border: 1px solid #e0e0e0;
+    flex: 1;
+  }
+  .search-btn {
+    background-color: #fe424d;
+    color: #ffff;
+    border-radius: 25px;
+    padding: 0.6rem 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .search-btn:hover {
+    background-color: #f02633;
   }
   .search-btn i {
-    display: inline;
-    margin-right: 0.5rem;
+    margin-right: 0.3rem;
   }
-  
-  .search-input{
+  .feedback-btn {
+    background-color: #222222;
+    color: #ffffff;
+    border: none;
+    padding: 0.6rem 1.2rem;
     border-radius: 25px;
-    padding: 0.5rem 3rem 0.5rem 3rem;
-    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
   }
-
-
+  .feedback-btn:hover {
+    background-color: #fe424d;
+  }
 </style>
 
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
@@ -34,31 +52,47 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        
         <a class="nav-link" href="/listings">Explore</a>
       </div>
 
-      <div class="navbar-nav ms-auto">
-         <form class="d-flex" role="search">
-      <input class="form-control me-2 search-input" type="search" placeholder="Search destinations"/>
-      <button class=" btn search-btn" type="submit">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        Search</button>
-    </form>
+      <div class="navbar-nav ms-auto search-form">
+        <input id="navSearchInput" class="form-control search-input" type="search" placeholder="Search stays..." />
       </div>
 
       <div class="navbar-nav ms-auto">
         <a class="nav-link" href="/listings/new">Airbnb your home</a>
+        <button class="btn feedback-btn" data-bs-toggle="modal" data-bs-target="#feedbackModal" style="margin: 0 0.5rem;">Feedback</button>
         
         <% if(!locals.currUser){%>
-
         <a class="nav-link active" href="/signup"><b>Sign up</b></a>
         <a class="nav-link" href="/login"><b>Log in</b></a>
         <% } %>
-       <% if(locals.currUser){%>
+        <% if(locals.currUser){%>
         <a class="nav-link" href="/logout"><b>Log out</b></a>
-      <% } %>
+        <% } %>
       </div>
     </div>
   </div>
 </nav>
+
+<script>
+  const navSearchInput = document.getElementById('navSearchInput');
+  if (navSearchInput) {
+    navSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const query = navSearchInput.value.trim();
+        if (query) {
+          const listingsGrid = document.getElementById('listingsGrid');
+          if (listingsGrid) {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+              searchInput.value = query;
+              searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+              window.scrollTo({ top: 300, behavior: 'smooth' });
+            }
+          }
+        }
+      }
+    });
+  }
+</script>

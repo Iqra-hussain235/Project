@@ -67,6 +67,18 @@
            Please enter the location!
           </div>
         </div>
+
+        <div class="mb-3">
+          <label for="category" class="form-label">Category</label>
+          <% const categories = ["Trending", "Rooms", "Iconic Cities", "Mountains", "Castle", "Arctic", "Camping", "Farms", "Domes"];
+             const currentCategory = listing.category || 'Trending'; %>
+          <select name="listing[category]" class="form-control" required>
+            <% for (let category of categories) { %>
+              <option value="<%= category %>" <%= currentCategory === category ? 'selected' : '' %>><%= category %></option>
+            <% } %>
+          </select>
+          <div class="invalid-feedback">Please choose a category.</div>
+        </div>
        
        <button class="btn btn-dark edit-btn mt-3">Edit</button>
        <br>

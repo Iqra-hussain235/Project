@@ -16,6 +16,7 @@ const flash= require("connect-flash");
 const passport = require("passport");
 const localStrategy = require("passport-local");
 const User = require("./models/user.js");
+const nodemailer = require("nodemailer");
 
 
 
@@ -63,16 +64,12 @@ mongoose.connection.on('reconnected', () => {
 
 
 main()
-    .then(()=>{
-       console.log("connect to DB");
+    .then(() => {
+      console.log("connect to DB");
     })
-    .catch((err)=>{
-        console.log(err);
+    .catch((err) => {
+      console.error(err);
     });
-
-async function main() {
-      await mongoose.connect(dburl);
-}
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -84,17 +81,17 @@ app.use(express.static('public'));
 console.log("View path:", path.join(__dirname, "views"));
 console.log(mongoose.modelNames());
 
-const store =MongoStore.create({
-  mongoUrl:dburl,
-  crypto:{
-    secret:process.env.SECRET,
+const store = MongoStore.create({
+  mongoUrl: dburl,
+  crypto: {
+    secret: process.env.SECRET,
   },
-  touchAfter:24*3600,
-})
+  touchAfter: 24 * 3600,
+});
 
-store.on("error",()=>{
-  console.log("Error in Mongo SESSION STORE",err);
-})
+store.on("error", (err) => {
+  console.error("Error in Mongo SESSION STORE", err);
+});
 
 const sessionOptions={
   store,
@@ -132,6 +129,46 @@ app.use((req,res,next)=>{
     next();
 });
 
+// Feedback email route (EARLY in middleware stack)
+app.post("/send-feedback", async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    // Configure nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "iqrah7085@gmail.com",
+        pass: "ngxe xkea jhia xgcc" // App-specific password for Gmail
+      }
+    });
+
+    // Email content
+    const mailOptions = {
+      from: email,
+      to: "iqrah7085@gmail.com",
+      subject: `Feedback from ${name} - WanderLust`,
+      html: `
+        <h2>New Feedback Received</h2>
+        <p><strong>From:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong></p>
+        <p>${message.replace(/\n/g, '<br>')}</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: "Feedback sent successfully!" });
+  } catch (error) {
+    console.error("Error sending feedback:", error);
+    res.status(500).json({ message: "Failed to send feedback. Please try again later." });
+  }
+});
+
 app.get("/demouser",async (req,res)=>{
   let fakeUser =new User({
     email:"student@gmail.com",
@@ -153,7 +190,6 @@ app.get("/", (req, res) => {
 app.use("/listings",listingRouter);
 app.use("/listings/:id/review", reviewRouter);
 app.use("/",userRouter);
-
 
 // /:id/reviews/:reviewId
 
